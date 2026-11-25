@@ -1,0 +1,79 @@
+# Space Exploration Channel - Git Ignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+
+# Virtual environments
+venv/
+.venv/
+
+# Configuration (secrets)
+config/orchestrator.yaml
+config/youtube_client_secrets.json
+config/youtube_token.json
+config/pronunciation.json
+.env
+.env.local
+
+# Assets (large files)
+assets/nasa/
+assets/branding/*.png
+assets/branding/*.jpg
+assets/luts/
+output/
+cache/
+logs/
+scripts/davinci_scripts/
+scripts/__pycache__/
+state/
+backups/
+models/rife/*.pth
+models/rife/*.onnx
+
+# Binaries
+bin/rife-ncnn-vulkan
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Docker
+.docker/
+
+# Monitoring
+monitoring/grafana/dashboards/*.json.local
+
+# Temporary
+tmp/
+temp/
+*.tmp
+*.log
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Distribution
+dist/
+build/
+*.egg-info/

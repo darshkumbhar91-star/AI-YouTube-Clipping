@@ -1,0 +1,129 @@
+version: '3.8'
+
+services:
+  # Main orchestration service
+  orchestrator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: app
+    container_name: space-exploration-orchestrator
+    restart: unless-stopped
+    environment:
+      - CONFIG_PATH=/app/config/orchestrator.yaml
+      - PYTHONPATH=/app
+      - PATH=/opt/venv/bin:/opt/bin:/usr/local/bin:/usr/bin:/bin
+      # API Keys (set via .env file or Docker secrets)
+      - NASA_API_KEY=${NASA_API_KEY:-DEMO_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ELEVENLABS_API_KEY=${ELEVENLABS_API_KEY}
+      - YOUTUBE_CLIENT_SECRETS=${YOUTUBE_CLIENT_SECRETS}
+    volumes:
+      - ./config:/app/config:ro
+      - ./assets:/app/assets
+      - ./output:/app/output
+      - ./logs:/app/logs
+      - ./cache:/app/cache
+      - ./state:/app/state
+      - ./scripts:/app/scripts
+      - ./templates:/app/templates
+      - ./models:/app/models
+      - ./backups:/app/backups
+      # YouTube auth tokens
+      - ./config/youtube_token.json:/app/config/youtube_token.json
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu, compute, utility]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import skills; print('OK')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+  # Redis for caching and queue management
+  redis:
+    image: redis:7-alpine
+    container_name: space-exploration-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Optional: Monitoring with Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: space-exploration-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    profiles:
+      - monitoring
+
+  # Optional: Grafana for dashboards
+  grafana:
+    image: grafana/grafana:latest
+    container_name: space-exploration-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    profiles:
+      - monitoring
+
+  # Optional: Nginx reverse proxy for web dashboard
+  nginx:
+    image: nginx:alpine
+    container_name: space-exploration-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./monitoring/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+    depends_on:
+      - orchestrator
+    profiles:
+      - web
+
+volumes:
+  redis-data:
+  prometheus-data:
+  grafana-data:
+
+networks:
+  default:
+    name: space-exploration-network

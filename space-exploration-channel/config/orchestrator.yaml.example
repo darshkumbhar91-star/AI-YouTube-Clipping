@@ -1,0 +1,167 @@
+# Space Exploration Channel - Orchestrator Configuration
+# Copy to config/orchestrator.yaml and fill in your API keys
+
+channel:
+  name: "Space Explained"
+  handle: "@SpaceExplained"
+  description: |
+    Your daily dose of space exploration, planetary science, and cosmic wonder.
+    We break down complex space missions, explain the latest discoveries, and 
+    visualize the universe using real NASA footage and cutting-edge graphics.
+    
+    New videos every Tuesday, Thursday, and Saturday at 6 PM EST.
+    
+    🚀 Subscribe for the journey: https://youtube.com/@SpaceExplained
+  keywords: "space, nasa, astronomy, space exploration, planetary science, cosmology, exoplanets, rockets, spacex, artemis, mars, moon, james webb, hubble, iss, spacewalk, rocket science, orbital mechanics"
+  upload_schedule:
+    days: ["tuesday", "thursday", "saturday"]
+    time: "18:00"
+    timezone: "US/Eastern"
+  content_pillars:
+    - "planetary_science"
+    - "space_technology"
+    - "cosmology"
+    - "exoplanets"
+    - "missions"
+    - "space_news"
+  playlists:
+    - title: "🚀 Space Missions & Launches"
+      description: "Live launches, mission updates, rocket science"
+    - title: "🌌 Deep Space & Cosmology"
+      description: "Black holes, galaxies, dark matter, universe origins"
+    - title: "🪐 Planetary Science"
+      description: "Mars, Venus, gas giants, moons, exoplanets"
+    - title: "🛰️ Space Technology"
+      description: "Rockets, satellites, stations, propulsion, robotics"
+    - title: "👨‍🚀 Astronaut Life & EVA"
+      description: "Spacewalks, ISS life, training, human spaceflight"
+    - title: "📰 Space News & Updates"
+      description: "Weekly space news, industry updates, policy"
+    - title: "🎬 Shorts: Quick Space Facts"
+      description: "60-second space facts, vertical format"
+
+skills:
+  nasa_research:
+    nasa_api_key: "DEMO_KEY"  # Get your own at api.nasa.gov
+    cache_ttl: 86400
+    max_results: 20
+  
+  space_news:
+    rss_feeds:
+      - "https://www.nasa.gov/rss/dyn/breaking_news.rss"
+      - "https://www.space.com/rss"
+      - "https://www.esa.int/rss/esa_space_science.xml"
+      - "https://spacenews.com/feed/"
+      - "https://arstechnica.com/space/feed/"
+      - "https://www.nasaspaceflight.com/feed/"
+    keywords:
+      - "artemis"
+      - "spacex"
+      - "starship"
+      - "james webb"
+      - "jwst"
+      - "mars"
+      - "moon"
+      - "exoplanet"
+      - "rocket"
+      - "launch"
+      - "iss"
+      - "astronaut"
+    lookback_days: 7
+  
+  deep_dive:
+    openai_api_key: ""  # REQUIRED
+    max_depth: 3
+    sources_per_topic: 5
+  
+  script_writer:
+    openai_api_key: ""  # REQUIRED
+    default_tone: "educational"
+    target_duration: 480
+    elevenlabs_voice_id: "pNInz6obpgDQGcFmaJgB"
+  
+  title_optimizer:
+    openai_api_key: ""  # REQUIRED
+  
+  nasa_footage:
+    storage_path: "assets/nasa"
+    max_concurrent_downloads: 4
+    transcode_preset: "prores_proxy"
+    proxy_resolution: [1920, 1080]
+  
+  motion_graphics:
+    blender_path: "/usr/bin/blender"
+    template_library: "templates/blender"
+    gpu_render: true
+    samples: 128
+    denoise: true
+  
+  compositing:
+    davinci_path: "/opt/resolve/bin/resolve"
+    project_template: "templates/davinci/space_template.drp"
+    color_space: "DaVinci YRGB Color Managed"
+    lut_library: "assets/luts"
+  
+  rife_interpolation:
+    rife_model_path: "models/rife"
+    gpu_enabled: true
+    scale_factor: 2.0
+    ensemble: false
+    uhd_mode: false
+  
+  elevenlabs_tts:
+    api_key: ""  # REQUIRED
+    default_voice: "narrator"
+    cache_dir: "cache/voice"
+    max_concurrent: 3
+    output_format: "mp3_44100_128"
+  
+  pronunciation_manager:
+    dictionary_path: "config/pronunciation.json"
+    auto_learn: true
+  
+  youtube_auth:
+    client_secrets_file: "config/youtube_client_secrets.json"
+    token_file: "config/youtube_token.json"
+    scopes:
+      - "https://www.googleapis.com/auth/youtube.upload"
+      - "https://www.googleapis.com/auth/youtube.readonly"
+      - "https://www.googleapis.com/auth/youtube.force-ssl"
+      - "https://www.googleapis.com/auth/youtubepartner"
+  
+  phase1_channel_setup:
+    channel_config: {}  # Uses channel config above
+    branding_assets_dir: "assets/branding"
+  
+  phase2_content_pipeline:
+    upload_schedule: {}  # Uses channel config above
+    content_pillars: []  # Uses channel config above
+    batch_size: 3
+    quality_thresholds:
+      min_script_score: 0.8
+      min_visual_quality: 0.7
+      min_audio_quality: 0.8
+  
+  phase3_optimization:
+    analytics_api: ""
+    testing_config: {}
+    ab_test_duration: 86400
+    significance_threshold: 0.95
+  
+  phase4_scaling:
+    scaling_config: {}
+    localization_langs: ["es", "pt", "de", "fr", "hi", "ja"]
+
+quality:
+  min_script_score: 0.8
+  min_visual_quality: 0.7
+  min_audio_quality: 0.8
+  require_manual_review: true
+
+paths:
+  assets: "assets"
+  output: "output"
+  cache: "cache"
+  logs: "logs"
+  scripts: "scripts"
+  templates: "templates"
